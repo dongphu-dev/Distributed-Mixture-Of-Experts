@@ -86,10 +86,10 @@ function results = exp_ablation_rare_M4()
     end
 
     options = get_options('default');
-    options.nb_EM_runs  = 2;
-    options.max_iter    = 40;
-    options.DME_maxiter = 100;
-    options.DME_tol     = 1e-4;
+    options.nb_EM_runs  = 5;
+    options.max_iter    = 500;
+    options.DME_maxiter = 500;
+    options.DME_tol     = 1e-6;
     options.verbose     = 0;
     options.DME_verbose = 0;
 

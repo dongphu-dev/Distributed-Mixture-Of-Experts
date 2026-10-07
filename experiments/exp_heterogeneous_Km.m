@@ -71,8 +71,8 @@ function results = exp_heterogeneous_Km()
 
     % Options
     options = get_options('default');
-    options.nb_EM_runs = 2;
-    options.max_iter   = 40;
+    options.nb_EM_runs = 5;
+    options.max_iter   = 500;
     options.DME_tries  = 2;
     options.verbose    = 0;
     options.DME_verbose = 0;

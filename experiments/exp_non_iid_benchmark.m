@@ -75,10 +75,10 @@ options = get_options('default');
 options.DME_verbose = 0;
 options.verbose     = 0;
 options.sample_size = 2000; % Supporting sample size S
-options.IRLS_max_iter = 30;
+options.IRLS_max_iter = 100;
 options.IRLS_threshold = 1e-5;
-options.max_iter       = 150; % Fast, guaranteed convergence with Random Hyperplane init
-options.nb_EM_runs     = 2;   % 2 starts with random hyperplanes
+options.max_iter       = 500; % Fast, guaranteed convergence with Random Hyperplane init
+options.nb_EM_runs     = 5;   % 5 starts with random hyperplanes
 options.FedAvg_rounds  = 5;
 options.FedAvg_local_iters = 15;
 

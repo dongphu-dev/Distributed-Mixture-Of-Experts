@@ -33,7 +33,7 @@ function bic_results = validate_local_bic()
     d = config.d;
 
     options = get_options('default');
-    options.nb_EM_runs = 2;
+    options.nb_EM_runs = 5;
     options.max_iter   = 30;
     options.verbose    = 0;
 

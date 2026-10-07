@@ -79,8 +79,8 @@ function results = exp_official_heterogeneous_Km_benchmark(N_total, num_runs, S)
     options.IRLS_max_iter  = 100;
     options.max_iter       = 100;
     options.parallel_machines = false; % Guarantees outer parfor is over datasets, inner loop is serial over machines
-    options.DME_maxiter = 100;
-    options.DME_tol     = 1e-4;
+    options.DME_maxiter = 500;
+    options.DME_tol     = 1e-6;
     options.verbose     = 0;
     options.DME_verbose = 0;
     options.S           = S; % Tunable support sample size S = |D_S|

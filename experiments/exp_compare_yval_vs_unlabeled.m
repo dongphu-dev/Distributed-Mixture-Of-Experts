@@ -79,10 +79,10 @@ function results = exp_compare_yval_vs_unlabeled()
     options.verbose     = 0;
     options.S           = S;
     options.sample_size = S;
-    options.IRLS_max_iter = 30;
+    options.IRLS_max_iter = 100;
     options.IRLS_threshold = 1e-5;
     options.max_iter       = 50;
-    options.nb_EM_runs     = 2;
+    options.nb_EM_runs     = 5;
 
     % Subsample supporting dataset D_S
     rng(1234, 'twister');
@@ -188,7 +188,7 @@ function results = exp_compare_yval_vs_unlabeled()
     opt_bj.verbose         = 0;
     opt_bj.DME_verbose     = 0;
     opt_bj.max_iter        = 20;
-    opt_bj.nb_EM_runs      = 2;
+    opt_bj.nb_EM_runs      = 5;
     opt_bj.IRLS_max_iter   = 30;
     opt_bj.IRLS_threshold  = 1e-5;
 

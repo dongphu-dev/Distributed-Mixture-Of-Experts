@@ -48,10 +48,10 @@ function results = exp_mac_5runs_compare_unlabeled()
     options.verbose         = 0;
     options.S               = S;
     options.sample_size     = S;
-    options.IRLS_max_iter   = 30;
+    options.IRLS_max_iter   = 100;
     options.IRLS_threshold  = 1e-5;
-    options.max_iter        = 40;
-    options.nb_EM_runs      = 2;
+    options.max_iter        = 500;
+    options.nb_EM_runs      = 5;
     options.FedAvg_rounds   = 5;
     options.FedAvg_local_iters = 10;
 
