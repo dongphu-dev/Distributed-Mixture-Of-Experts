@@ -76,7 +76,7 @@ function results = run_year_msd_benchmark(use_sub10, K, S, max_iter, nb_EM_runs)
     options.S          = S;
     options.threshold  = 1e-4;
 
-    models_to_evaluate = {'GLB', 'DME', 'GM', 'AAVR', 'FED', 'WAVR', 'MED'};
+    models_to_evaluate = {'GLB', 'DME', 'GM', 'AAVR', 'WAVR', 'MED'};
     results = struct();
 
     % -------------------------------------------------------------------------
@@ -171,19 +171,6 @@ function results = run_year_msd_benchmark(use_sub10, K, S, max_iter, nb_EM_runs)
             case 'AAVR'
                 fit = Aligned_MixtureOfExperts(DMEfit, K, M, options);
                 learning_time = t_local_max + fit.learning_time;
-
-            case 'FED'
-                % Simulated Federated Averaging (T=5 rounds)
-                opt_fed = options;
-                opt_fed.client_indices = cell(1, M);
-                curr = 1;
-                for m = 1:M
-                    n_m = size(X_train_cells{m}, 1);
-                    opt_fed.client_indices{m} = (curr : curr + n_m - 1)';
-                    curr = curr + n_m;
-                end
-                fit = FedAvg_MixtureOfExperts(X_train_pooled, Y_train_pooled, K, M, opt_fed);
-                learning_time = fit.learning_time;
 
             case 'WAVR'
                 fit = Averaged_MixtureOfExperts(DMEfit, K, M, options);
@@ -324,7 +311,6 @@ function name = model_display_name(mod)
         case 'DME', name = 'Proposed (DME)';
         case 'GM', name = 'Greedy merging (GM)';
         case 'AAVR', name = 'Aligned averaging (AAVR)';
-        case 'FED', name = 'Federated averaging (FED)';
         case 'WAVR', name = 'Naive averaging (WAVR)';
         case 'MED', name = 'Coordinate median (MED)';
         otherwise,  name = mod;

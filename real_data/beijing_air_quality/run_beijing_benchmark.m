@@ -7,7 +7,7 @@ function results = run_beijing_benchmark(K, S, max_iter, nb_EM_runs)
 %       Test:  2016-03-01 to 2017-02-28 (105,120 future samples, 1 full year)
 %   - Features (d = 19): Autoregressive lags, meteorology, gas precursors, cyclical time
 %   - Target: PM2.5 concentration (ug/m^3)
-%   - Models: GLB, DME, GM (GM), AAVR (AAVR), FED (T=1, 5, 10, 20), WAVR (WAVR), MED
+%   - Models: GLB, DME, GM (GM), AAVR (AAVR), WAVR (WAVR), MED
 %   - Metrics: Trandis to f^W and GLB, RMSE, MAE, RPE, Correlation, Learning Time
 %
 % Usage:
@@ -67,7 +67,7 @@ function results = run_beijing_benchmark(K, S, max_iter, nb_EM_runs)
     options.S          = S;
     options.threshold  = 1e-4;
 
-    models_to_evaluate = {'GLB', 'DME', 'GM', 'AAVR', 'FED_T1', 'FED_T5', 'FED_T10', 'FED_T20', 'WAVR', 'MED'};
+    models_to_evaluate = {'GLB', 'DME', 'GM', 'AAVR', 'WAVR', 'MED'};
     results = struct();
 
     % -------------------------------------------------------------------------
@@ -155,22 +155,6 @@ function results = run_beijing_benchmark(K, S, max_iter, nb_EM_runs)
     f_W.PI_hat = PI_hat_W;
 
     % -------------------------------------------------------------------------
-    % Step 1b: Pre-train FedAvg Trajectory (T=20 with snapshots)
-    % -------------------------------------------------------------------------
-    fprintf('\n--> Pre-training FedAvg trajectory (T=20, snapshots at T in {1, 5, 10, 20})...\n');
-    opt_fed = options;
-    opt_fed.FedAvg_rounds    = 20;
-    opt_fed.FedAvg_snapshots = [1, 5, 10, 20];
-    opt_fed.client_indices   = cell(1, M);
-    curr = 1;
-    for m = 1:M
-        n_m = size(X_train_cells{m}, 1);
-        opt_fed.client_indices{m} = (curr : curr + n_m - 1)';
-        curr = curr + n_m;
-    end
-    fed_traj = FedAvg_MixtureOfExperts(X_train_pooled, Y_train_pooled, K, M, opt_fed);
-
-    % -------------------------------------------------------------------------
     % Step 2: Fit and Evaluate Each Estimator
     % -------------------------------------------------------------------------
     fprintf('\n--> [2/3] Executing Aggregation & Oracle Benchmarks...\n');
@@ -209,17 +193,6 @@ function results = run_beijing_benchmark(K, S, max_iter, nb_EM_runs)
             case 'AAVR'
                 fit = Aligned_MixtureOfExperts(DMEfit, K, M, options);
                 learning_time = t_local_max + fit.learning_time;
-
-            case {'FED_T1', 'FED_T5', 'FED_T10', 'FED_T20'}
-                if isfield(fed_traj, 'snapshots') && isfield(fed_traj.snapshots, mod)
-                    fit = fed_traj.snapshots.(mod);
-                else
-                    t_val = str2double(strrep(mod, 'FED_T', ''));
-                    f_opt = opt_fed;
-                    f_opt.FedAvg_rounds = t_val;
-                    fit = FedAvg_MixtureOfExperts(X_train_pooled, Y_train_pooled, K, M, f_opt);
-                end
-                learning_time = fit.learning_time;
 
             case 'WAVR'
                 fit = Averaged_MixtureOfExperts(DMEfit, K, M, options);
@@ -382,10 +355,6 @@ function name = model_display_name(mod)
         case 'DME',     name = 'DME';
         case 'GM',     name = 'GM';
         case 'AAVR',     name = 'AAVR';
-        case 'FED_T1',  name = 'FED ($T=1$)';
-        case 'FED_T5',  name = 'FED ($T=5$)';
-        case 'FED_T10', name = 'FED ($T=10$)';
-        case 'FED_T20', name = 'FED ($T=20$)';
         case 'WAVR',     name = 'WAVR';
         case 'MED',     name = 'MED';
         otherwise,      name = mod;
