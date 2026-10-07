@@ -1,0 +1,22 @@
+% Auto-generated LaTeX table for YearPredictionMSD Benchmark
+\begin{table}[t]
+\centering
+\caption{YearPredictionMSD Benchmark: Evaluation of distributed MoE estimators on large-scale audio timbre regression ($M=32$ worker nodes, $N_{\text{train}}=46372$, out-of-sample test $N_{\text{test}}=5163$, $d=90$, $K=4$). Best distributed performance is in \textbf{bold}; Centralized Global Oracle ($G$) serves as upper-bound reference.}
+\label{tab:year_msd_benchmark}
+\vspace{1mm}
+\setlength{\tabcolsep}{7pt}
+\begin{tabular}{lcccccc}
+\hline\hline
+Estimator & RMSE (yrs) $\downarrow$ & MAE $\downarrow$ & RPE $\downarrow$ & Corr ($r$) $\uparrow$ & $\mathcal{D}(f, f^W)$ $\downarrow$ & Time (s) $\downarrow$ \\
+\hline
+Global oracle (G)        & 8.61 & 6.02 & 0.6776 & 0.5695 & 1012.7 & 11.7 \\
+\hline
+Proposed (DME)           & 9.50 & 6.62 & 0.8254 & 0.4469 & \textbf{584.7} & 9.3 \\
+Greedy merging (GM)     & 9.37 & 6.46 & 0.8026 & 0.4730 & 791.5 & 11.0 \\
+Aligned averaging (AAVR)  & 9.16 & 6.77 & 0.7669 & 0.5001 & 3317.9 & 10.1 \\
+Federated averaging (FED) & 10971283905193864.00 & 4224822959500797.00 & 1101017333833110009781640232960.0000 & -0.0486 & 1585.1 & 25.2 \\
+Naive averaging (WAVR)    & \textbf{8.98} & \textbf{6.31} & \textbf{0.7378} & \textbf{0.5160} & 3101.5 & 10.0 \\
+Coordinate median (MED)  & 14.16 & 9.46 & 1.8343 & 0.2398 & 2077.6 & 10.4 \\
+\hline\hline
+\end{tabular}
+\end{table}

@@ -1,0 +1,30 @@
+# Operating System
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE & Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# MATLAB temporary files
+*.asv
+*.m~
+*.slxc
+slprj/
+*.log
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Synthetic benchmark data files (exclude large .mat files in data/)
+data/*.mat
