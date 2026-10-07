@@ -17,7 +17,7 @@ In distributed Mixture-of-Experts (MoE) regression, $M$ local workers train mode
 2. **Covariate-dependent gating**: Gating probabilities $\pi_k(\mathbf{x})$ vary with inputs, preventing standard unconditional mixture reduction.
 3. **Capacity heterogeneity**: Workers may observe different numbers of subpopulations, fitting local models with $K_m \neq K$.
 
-The proposed method aggregates local models into a global $K$-expert MoE in a single one-way communication round by minimizing a covariate-dependent transportation divergence on a small supporting sample $\mathbf{X}_S$. The server alternates between:
+The proposed method aggregates local models into a global K-expert MoE in a single one-way communication round by minimizing a covariate-dependent transportation divergence on a small supporting sample. The server alternates between:
 
 - A Majorization-Minimization (MM) step to optimize expert hyperplanes without requiring gating information.
 - An Iteratively Reweighted Least Squares (IRLS) step to estimate the global softmax gating parameters from optimal transport probabilities.
@@ -89,15 +89,15 @@ All synthetic experiments use $M = 16$ machines, $d = 20$ features, and $K = 5$ 
     exp_official_homogeneous_benchmark;
     ```
 
-    Evaluates GLB, DMoE, GM, AAVR, WAVR, MED, and FED ($T \in \{1, 5, 10, 20\}$).
+    Evaluates GLB, DMoE, GM, A-AVR, W-AVR, MED, and FED.
 
-2. **Experiment 2: Heterogeneous capacities** ($K_m = 3 \to K = 5$):
+2. **Experiment 2: Heterogeneous capacities** (K_m=3 to K=5):
 
     ```matlab
     exp_official_heterogeneous_Km_benchmark;
     ```
 
-    Evaluates aggregation when local workers fit only $K_m = 3$ experts, yielding $L = 48$ components to aggregate into $K = 5$.
+    Evaluates aggregation when local workers fit only K_m=3 experts, yielding L=48 components to aggregate into K=5.
 
 3. **Experiment 3: Sensitivity to Support Sample Size $S$**:
     ```matlab
@@ -115,7 +115,7 @@ run_all_benchmarks('quick');
 
 ## Real-World datasets
 
-1. **Beijing multi-site air quality** ($M = 12$ stations, $K = 4$, $d = 19$):
+1. **Beijing multi-site air quality** (M=12 stations, K=4, d=19):
 
     ```matlab
     cd real_data/beijing_air_quality
@@ -124,7 +124,7 @@ run_all_benchmarks('quick');
 
     Predicts hourly $\text{PM}_{2.5}$ with out-of-time evaluation (3-year training, 1-year test).
 
-2. **YearPredictionMSD** ($M = 32$ nodes, $K = 4$, $d = 90$):
+2. **YearPredictionMSD** (M=32 nodes, K=4, d=90):
     ```matlab
     cd real_data/year_prediction_msd
     run_year_msd_benchmark;
