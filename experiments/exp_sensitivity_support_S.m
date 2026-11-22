@@ -243,14 +243,6 @@ function results = exp_sensitivity_support_S(num_runs, S_list, N_total, profile_
     end
     save(out_mat, 'results', 'raw_runs', 'S_list', 'N_total', 'N_m', 'M', 'K', 'd', 'runs_to_process', 'profile_name', '-v7.3');
     fprintf('\n==> Successfully saved Sensitivity results to: %s\n', out_mat);
-
-    % Export LaTeX Table (if exporter is available)
-    if exist('export_latex_sensitivity_table', 'file')
-        table_dir = fullfile(base_dir, 'results', 'tables');
-        export_latex_sensitivity_table(out_mat, table_dir);
-        fprintf('==> Exported sensitivity LaTeX table successfully!\n');
-    end
-
 end
 
 %% Helper: Evaluate DME, GM, MED for a given support set X_val

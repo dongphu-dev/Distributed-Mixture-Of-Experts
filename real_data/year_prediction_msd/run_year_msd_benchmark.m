@@ -218,18 +218,12 @@ function results = run_year_msd_benchmark(use_sub10, K, S, max_iter, nb_EM_runs)
     % Save results
     if use_sub10
         out_res_file = fullfile(current_dir, 'result_year_msd_sub10.mat');
-        tex_file     = fullfile(current_dir, 'table_year_msd_sub10.tex');
     else
         out_res_file = fullfile(current_dir, 'result_year_msd.mat');
-        tex_file     = fullfile(current_dir, 'table_year_msd.tex');
     end
 
     save(out_res_file, 'results', 'models_to_evaluate', 'M', 'K', 'd', 'options', 'use_sub10', '-v7.3');
     fprintf('Saved numerical results to: %s\n', out_res_file);
-
-    % Export LaTeX table
-    export_year_msd_latex(results, models_to_evaluate, tex_file, N_train, N_test, M, d, K);
-    fprintf('Exported LaTeX table to:    %s\n', tex_file);
 end
 
 % -------------------------------------------------------------------------
@@ -317,76 +311,4 @@ function name = model_display_name(mod)
     end
 end
 
-% -------------------------------------------------------------------------
-% Helper: Export LaTeX Table
-% -------------------------------------------------------------------------
-function export_year_msd_latex(results, models, out_path, N_train, N_test, M, d, K)
-    fid = fopen(out_path, 'w');
-    if fid == -1, return; end
 
-    fprintf(fid, '%% Auto-generated LaTeX table for YearPredictionMSD Benchmark\n');
-    fprintf(fid, '\\begin{table}[t]\n\\centering\n');
-    fprintf(fid, '\\caption{YearPredictionMSD Benchmark: Evaluation of distributed MoE estimators on large-scale audio timbre regression ($M=%d$ worker nodes, $N_{\\text{train}}=%s$, out-of-sample test $N_{\\text{test}}=%s$, $d=%d$, $K=%d$). Best distributed performance is in \\textbf{bold}; Centralized Global Oracle ($G$) serves as upper-bound reference.}\n', ...
-            M, num2str(N_train), num2str(N_test), d, K);
-    fprintf(fid, '\\label{tab:year_msd_benchmark}\n\\vspace{1mm}\n');
-    fprintf(fid, '\\setlength{\\tabcolsep}{7pt}\n');
-    fprintf(fid, '\\begin{tabular}{lcccccc}\n');
-    fprintf(fid, '\\hline\\hline\n');
-    fprintf(fid, 'Estimator & RMSE (yrs) $\\downarrow$ & MAE $\\downarrow$ & RPE $\\downarrow$ & Corr ($r$) $\\uparrow$ & $\\mathcal{D}(f, f^W)$ $\\downarrow$ & Time (s) $\\downarrow$ \\\\\n');
-    fprintf(fid, '\\hline\n');
-
-    % Find best distributed values (excluding GLB)
-    best_rmse = inf; best_mae = inf; best_rpe = inf; best_corr = -inf; best_dfW = inf;
-    for i = 1:length(models)
-        mod = models{i};
-        if strcmp(mod, 'GLB'), continue; end
-        r = results.(mod);
-        if r.RMSE < best_rmse, best_rmse = r.RMSE; end
-        if r.MAE < best_mae,   best_mae = r.MAE; end
-        if r.RPE < best_rpe,   best_rpe = r.RPE; end
-        if r.Correlation > best_corr, best_corr = r.Correlation; end
-        if ~isnan(r.D_fW) && r.D_fW < best_dfW, best_dfW = r.D_fW; end
-    end
-
-    tol = 1e-4;
-    for i = 1:length(models)
-        mod = models{i};
-        r = results.(mod);
-        name = model_display_name(mod);
-        is_glb = strcmp(mod, 'GLB');
-
-        % Format strings
-        str_rmse = sprintf('%.2f', r.RMSE);
-        if ~is_glb && abs(r.RMSE - best_rmse) < tol, str_rmse = sprintf('\\textbf{%s}', str_rmse); end
-
-        str_mae = sprintf('%.2f', r.MAE);
-        if ~is_glb && abs(r.MAE - best_mae) < tol, str_mae = sprintf('\\textbf{%s}', str_mae); end
-
-        str_rpe = sprintf('%.4f', r.RPE);
-        if ~is_glb && abs(r.RPE - best_rpe) < tol, str_rpe = sprintf('\\textbf{%s}', str_rpe); end
-
-        str_corr = sprintf('%.4f', r.Correlation);
-        if ~is_glb && abs(r.Correlation - best_corr) < tol, str_corr = sprintf('\\textbf{%s}', str_corr); end
-
-        if isnan(r.D_fW)
-            str_dfW = '---';
-        else
-            str_dfW = sprintf('%.1f', r.D_fW);
-            if ~is_glb && abs(r.D_fW - best_dfW) < tol, str_dfW = sprintf('\\textbf{%s}', str_dfW); end
-        end
-
-        str_time = sprintf('%.1f', r.Learning_Time);
-
-        fprintf(fid, '%-24s & %s & %s & %s & %s & %s & %s \\\\\n', ...
-                name, str_rmse, str_mae, str_rpe, str_corr, str_dfW, str_time);
-
-        if is_glb
-            fprintf(fid, '\\hline\n');
-        end
-    end
-
-    fprintf(fid, '\\hline\\hline\n');
-    fprintf(fid, '\\end{tabular}\n');
-    fprintf(fid, '\\end{table}\n');
-    fclose(fid);
-end

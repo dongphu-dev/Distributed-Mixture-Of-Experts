@@ -151,7 +151,3 @@ out_mat = fullfile(out_dir, 'Result_IID_M16_N100k.mat');
 save(out_mat, 'All_results', 'profiles', 'all_models', 'M', 'N_total', 'K', 'd', 'options', '-v7.3');
 fprintf('\n==> Successfully saved IID benchmark results to: %s\n', out_mat);
 
-%% Export LaTeX Table 1
-table_dir = fullfile(base_dir, 'results', 'tables');
-export_latex_two_tables(out_mat, '', table_dir);
-fprintf('==> LaTeX Table 1 exported successfully!\n');

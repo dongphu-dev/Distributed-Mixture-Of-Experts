@@ -206,57 +206,10 @@ function results = exp_test_mac_trandis_fW()
     end
     fprintf('=======================================================================================================================\n\n');
 
-    % Export Publication-Quality LaTeX Table
-    tex_dir = fullfile(base_dir, 'results', 'tables');
-    if ~exist(tex_dir, 'dir'), mkdir(tex_dir); end
-    tex_file = fullfile(tex_dir, 'table_test_trandis_fW.tex');
-    export_trandis_fW_latex(metrics_all, models, tex_file);
-    fprintf('Exported publication LaTeX table to: %s\n', tex_file);
-
     results = metrics_all;
     save(fullfile(base_dir, 'results', 'result_test_mac_trandis_fW.mat'), 'results', 'models');
 end
 
-% -------------------------------------------------------------------------
-% Helper: Export publication LaTeX table
-% -------------------------------------------------------------------------
-function export_trandis_fW_latex(metrics, models, filename)
-    fid = fopen(filename, 'w');
-    if fid == -1, error('Cannot write to: %s', filename); end
-
-    fprintf(fid, '%% Auto-generated LaTeX table comparing D(f, f^*) vs D(f, f^W)\n');
-    fprintf(fid, '\\begin{table}[t]\n\\centering\n');
-    fprintf(fid, '\\caption{Distributed MoE Aggregation: Comparison of estimation accuracy against ground truth $\\mathcal{D}(f, f^*)$ and reduction divergence against pooled local mixture $\\mathcal{D}(f, f^W)$ ($M=16, K=5, d=20, N=100\\text{k}, S=2000$). Best distributed performance is in \\textbf{bold}.}\n');
-    fprintf(fid, '\\label{tab:trandis_fW}\n\\vspace{1mm}\n');
-    fprintf(fid, '\\setlength{\\tabcolsep}{5pt}\n');
-    fprintf(fid, '\\begin{tabular}{lcccccc}\n\\toprule\n');
-    fprintf(fid, '\\textbf{Estimator} & \\textbf{RPE} & \\textbf{Param MSE} & $\\mathcal{D}(f, f^*)$ & $\\mathcal{D}(f, f^W)$ & \\textbf{ARI} & \\textbf{Time (s)} \\\\\n');
-    fprintf(fid, '\\midrule\n');
-
-    for i = 1:length(models)
-        mod = models{i};
-        mat = metrics.(mod);
-        rpe_m  = mean(mat(:,5)); rpe_s  = std(mat(:,5));
-        mse_m  = mean(mat(:,4)); mse_s  = std(mat(:,4));
-        td_s_m = mean(mat(:,2)); td_s_s = std(mat(:,2));
-        td_w_m = mean(mat(:,3)); td_w_s = std(mat(:,3));
-        ari_m  = mean(mat(:,8)); ari_s  = std(mat(:,8));
-        time_m = mean(mat(:,1));
-
-        name_str = get_display_name(mod);
-        
-        if strcmp(mod, 'GLB')
-            fprintf(fid, '%-22s & $%0.4f$ & $%0.4f$ & $%0.2f$ & $%0.2f$ & $%0.4f$ & $%0.1f$ \\\\\n', ...
-                    name_str, rpe_m, mse_m, td_s_m, td_w_m, ari_m, time_m);
-            fprintf(fid, '\\midrule\n');
-        else
-            fprintf(fid, '%-22s & $%0.4f \\pm %0.4f$ & $%0.4f \\pm %0.4f$ & $%0.2f \\pm %0.2f$ & $%0.2f \\pm %0.2f$ & $%0.4f \\pm %0.4f$ & $%0.1f$ \\\\\n', ...
-                    name_str, rpe_m, rpe_s, mse_m, mse_s, td_s_m, td_s_s, td_w_m, td_w_s, ari_m, ari_s, time_m);
-        end
-    end
-    fprintf(fid, '\\bottomrule\n\\end{tabular}\n\\end{table}\n');
-    fclose(fid);
-end
 
 function name = get_display_name(mod)
     switch mod

@@ -290,11 +290,6 @@ function results = run_beijing_benchmark(K, S, max_iter, nb_EM_runs)
     out_res_file = fullfile(current_dir, 'result_beijing_air_quality.mat');
     save(out_res_file, 'results', 'models_to_evaluate', 'M', 'K', 'd', 'options', '-v7.3');
     fprintf('Saved numerical results to: %s\n', out_res_file);
-
-    % Export LaTeX table
-    tex_file = fullfile(current_dir, 'table_beijing_air_quality.tex');
-    export_beijing_latex(results, models_to_evaluate, tex_file);
-    fprintf('Exported LaTeX table to:    %s\n', tex_file);
 end
 
 % -------------------------------------------------------------------------
@@ -361,72 +356,3 @@ function name = model_display_name(mod)
     end
 end
 
-% -------------------------------------------------------------------------
-% Helper: Export LaTeX Table
-% -------------------------------------------------------------------------
-function export_beijing_latex(results, models, out_path)
-    fid = fopen(out_path, 'w');
-    if fid == -1, return; end
-
-    fprintf(fid, '%% Auto-generated LaTeX table for Beijing Multi-Site Air Quality Benchmark\n');
-    fprintf(fid, '\\begin{table}[t]\n\\centering\n');
-    fprintf(fid, '\\caption{Forecasting performance on the Beijing air quality sensor network ($M=12$ stations, $N_{\\text{train}}=315,360$, out-of-time test $N_{\\text{test}}=105,120$, $d=19$, $K=4$). RMSE and MAE are in $\\mu$g/m$^3$; Time is in seconds; $\\mathcal{T}_c$, RPE, and Pearson correlation ($r$) are dimensionless. Best distributed performance is in \\textbf{bold}; centralized oracle (GLB) serves as theoretical upper bound.}\n');
-    fprintf(fid, '\\label{tab:beijing_air_quality}\n\\vspace{1mm}\n');
-    fprintf(fid, '\\setlength{\\tabcolsep}{3.5pt}\n');
-    fprintf(fid, '\\resizebox{\\columnwidth}{!}{\n');
-    fprintf(fid, '\\begin{tabular}{lccccccc}\n\\toprule\n');
-    fprintf(fid, '\\textbf{Estimator} & $\\mathcal{T}_c(\\cdot,\\widehat f_{\\mathrm{GLB}})$ & $\\mathcal{T}_c(\\cdot,\\bar f^W)$ & \\textbf{RMSE} & \\textbf{MAE} & \\textbf{RPE} & \\textbf{Corr. ($r$)} & \\textbf{Time (s)} \\\\\n');
-    fprintf(fid, '\\midrule\n');
-
-    % Global Oracle
-    r = results.GLB;
-    fprintf(fid, '%-16s & $0.00$ & $%.2f$ & $%.2f$ & $%.2f$ & $%.4f$ & $%.4f$ & $%.1f$ \\\\\n', ...
-            'GLB', r.Trandis_fW, r.RMSE, r.MAE, r.RPE, r.Correlation, r.Learning_Time);
-    fprintf(fid, '\\midrule\n');
-
-    % Distributed estimators
-    dist_mods = models(~strcmp(models, 'GLB'));
-
-    % Rounded values for tie-breaking
-    v_tc_glb = cellfun(@(m) sprintf('%.2f', results.(m).Trandis_GLB), dist_mods, 'UniformOutput', false);
-    v_tc_fw  = cellfun(@(m) sprintf('%.2f', results.(m).Trandis_fW), dist_mods, 'UniformOutput', false);
-    v_rmse   = cellfun(@(m) sprintf('%.2f', results.(m).RMSE), dist_mods, 'UniformOutput', false);
-    v_mae    = cellfun(@(m) sprintf('%.2f', results.(m).MAE), dist_mods, 'UniformOutput', false);
-    v_rpe    = cellfun(@(m) sprintf('%.4f', results.(m).RPE), dist_mods, 'UniformOutput', false);
-    v_corr   = cellfun(@(m) sprintf('%.4f', results.(m).Correlation), dist_mods, 'UniformOutput', false);
-    v_time   = cellfun(@(m) sprintf('%.1f', results.(m).Learning_Time), dist_mods, 'UniformOutput', false);
-
-    best_tc_glb = sprintf('%.2f', min(cellfun(@(m) results.(m).Trandis_GLB, dist_mods)));
-    best_tc_fw  = sprintf('%.2f', min(cellfun(@(m) results.(m).Trandis_fW, dist_mods)));
-    best_rmse   = sprintf('%.2f', min(cellfun(@(m) results.(m).RMSE, dist_mods)));
-    best_mae    = sprintf('%.2f', min(cellfun(@(m) results.(m).MAE, dist_mods)));
-    best_rpe    = sprintf('%.4f', min(cellfun(@(m) results.(m).RPE, dist_mods)));
-    best_corr   = sprintf('%.4f', max(cellfun(@(m) results.(m).Correlation, dist_mods)));
-    best_time   = sprintf('%.1f', min(cellfun(@(m) results.(m).Learning_Time, dist_mods)));
-
-    for i = 1:length(dist_mods)
-        m = dist_mods{i};
-        
-        s_tc_glb = format_str(v_tc_glb{i}, strcmp(v_tc_glb{i}, best_tc_glb));
-        s_tc_fw  = format_str(v_tc_fw{i}, strcmp(v_tc_fw{i}, best_tc_fw));
-        s_rmse   = format_str(v_rmse{i}, strcmp(v_rmse{i}, best_rmse));
-        s_mae    = format_str(v_mae{i}, strcmp(v_mae{i}, best_mae));
-        s_rpe    = format_str(v_rpe{i}, strcmp(v_rpe{i}, best_rpe));
-        s_corr   = format_str(v_corr{i}, strcmp(v_corr{i}, best_corr));
-        s_time   = format_str(v_time{i}, strcmp(v_time{i}, best_time));
-
-        fprintf(fid, '%-16s & %s & %s & %s & %s & %s & %s & %s \\\\\n', ...
-                model_display_name(m), s_tc_glb, s_tc_fw, s_rmse, s_mae, s_rpe, s_corr, s_time);
-    end
-
-    fprintf(fid, '\\bottomrule\n\\end{tabular}\n}\n\\end{table}\n');
-    fclose(fid);
-end
-
-function str = format_str(val, is_best)
-    if is_best
-        str = sprintf('$\\mathbf{%s}$', val);
-    else
-        str = sprintf('$%s$', val);
-    end
-end

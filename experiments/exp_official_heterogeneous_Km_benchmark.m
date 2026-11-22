@@ -230,14 +230,4 @@ function results = exp_official_heterogeneous_Km_benchmark(N_total, num_runs, S)
     % Also save to default unversioned name for standard reference
     save(fullfile(out_dir, 'Result_Official_Heterogeneous_M16.mat'), 'results', '-v7.3');
     fprintf('\n==> Successfully saved Official Heterogeneous results to: %s\n', out_res);
-
-    % Export LaTeX Table (if exporter is available)
-    if exist('export_latex_official_tables', 'file')
-        table_dir = fullfile(base_dir, 'results', 'tables');
-        if ~exist(table_dir, 'dir'), mkdir(table_dir); end
-        tex_file = fullfile(table_dir, sprintf('table_official_exp2_heterogeneous_N%s.tex', N_str));
-        export_latex_official_tables('', out_res, table_dir);
-        copyfile(fullfile(table_dir, 'table_official_exp2_heterogeneous.tex'), tex_file);
-        fprintf('==> Official LaTeX Table 2 exported successfully to: %s\n', tex_file);
-    end
 end

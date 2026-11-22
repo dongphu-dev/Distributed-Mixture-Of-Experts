@@ -28,3 +28,9 @@ __pycache__/
 
 # Synthetic benchmark data files (exclude large .mat files in data/)
 data/*.mat
+
+# Experiment results and temporary outputs (clean repository for paper)
+results/
+*.tex
+*.mat.bak
+

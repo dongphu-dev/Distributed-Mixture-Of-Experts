@@ -30,13 +30,12 @@ function [learning_time, trandis, loglik, mse_param, RPE_test, corr_test, RI_tes
         %------------------------------------------------------------------
         if isfield(fit, 'reduced_mixture')
             % For Global, Median and Average MoE
-            [plan, distance_matrix] = argmin_transportation_plan(fit.reduced_mixture, true_mixture, [ones(N,1) X]);
             fit_eval = fit.reduced_mixture;
         else 
             % For Distributed MoE
-            [plan, distance_matrix] = argmin_transportation_plan(fit, true_mixture, [ones(N,1) X]);
             fit_eval = fit;
         end
+        [plan, distance_matrix] = argmin_transportation_plan(true_mixture, fit_eval, [ones(N,1) X]);
         trandis       = sum(sum(sum(plan .* distance_matrix)));
         
         % Distance to pooled local mixture f^W (reduction divergence)

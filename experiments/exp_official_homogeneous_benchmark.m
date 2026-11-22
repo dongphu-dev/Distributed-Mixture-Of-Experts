@@ -1,4 +1,4 @@
-function All_results = exp_official_homogeneous_benchmark(N_total, num_runs, S)
+function All_results = exp_official_homogeneous_benchmark(N_total, num_runs, S, profiles)
 %% EXP_OFFICIAL_HOMOGENEOUS_BENCHMARK
 % Master Experiment 1 (Official): Evaluates distributed MoE estimators under
 % standard homogeneous expert capacities (K_m = K = 5) across 3 subpopulation profiles:
@@ -70,7 +70,11 @@ function All_results = exp_official_homogeneous_benchmark(N_total, num_runs, S)
     end
 
     M = 16;
-    profiles = {'balanced', 'moderate', 'severe'};
+    if nargin < 4 || isempty(profiles)
+        profiles = {'balanced', 'moderate', 'severe'};
+    elseif ischar(profiles)
+        profiles = {profiles};
+    end
     models_to_run = {'DME', 'GM', 'AAVR', 'FED_T1', 'FED_T5', 'FED_T10', 'FED_T20', 'WAVR', 'MED'};
     all_models    = [{'GLB'}, models_to_run];
 
@@ -190,13 +194,5 @@ save(out_mat, 'All_results', 'profiles', 'all_models', 'M', 'N_total', 'K', 'd',
 % Also save unversioned default name for standard reference
 save(fullfile(out_dir, 'Result_Official_Homogeneous_M16_N100k.mat'), 'All_results', 'profiles', 'all_models', 'M', 'N_total', 'K', 'd', 'options', '-v7.3');
 fprintf('\n==> Successfully saved Official Homogeneous results to: %s\n', out_mat);
-
-% Export LaTeX Table (if exporter is available)
-if exist('export_latex_official_tables', 'file')
-    table_dir = fullfile(base_dir, 'results', 'tables');
-    if ~exist(table_dir, 'dir'), mkdir(table_dir); end
-    tex_file = fullfile(table_dir, sprintf('table_official_exp1_homogeneous_N%s.tex', N_str));
-    export_latex_official_tables(out_mat, '', table_dir);
-    copyfile(fullfile(table_dir, 'table_official_exp1_homogeneous.tex'), tex_file);
-    fprintf('==> Official LaTeX Table 1 exported successfully to: %s\n', tex_file);
 end
+

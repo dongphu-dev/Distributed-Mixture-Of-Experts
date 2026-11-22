@@ -158,11 +158,6 @@ out_mat = fullfile(out_dir, 'Result_NonIID_M16_N100k.mat');
 save(out_mat, 'All_results', 'profiles', 'all_models', 'M', 'N_total', 'K', 'd', 'shift_tau', 'options', '-v7.3');
 fprintf('\n==> Successfully saved Non-IID benchmark results to: %s\n', out_mat);
 
-%% Export LaTeX Table 2 (and update Table 1 if present)
-table_dir = fullfile(base_dir, 'results', 'tables');
-export_latex_two_tables(iid_mat_file, out_mat, table_dir);
-fprintf('==> LaTeX Table 2 exported successfully!\n');
-
 %% Helper Function: Covariate Shift Partitioning via Spatial Domain Affinity
 function client_indices = partition_covariate_shift(X_train, M, K, shift_tau, seed)
     if nargin >= 5, rng(seed, 'twister'); end
